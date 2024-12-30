@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Audio Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        audio {
+            width: 90%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Мінізастосунок: Аудіоплеєр</h1>
+    <div id="audio-container"></div>
+
+    <script>
+        // Функція для отримання аудіофайлів
+        async function fetchAudio() {
+            // Тут можна інтегрувати реальні аудіофайли через API
+            const audioData = [
+                { title: "Пісня 1", url: "https://samplelib.com/lib/preview/mp3/sample-3s.mp3" },
+                { title: "Пісня 2", url: "https://samplelib.com/lib/preview/mp3/sample-6s.mp3" }
+            ];
+
+            const container = document.getElementById("audio-container");
+            audioData.forEach(audio => {
+                const audioElement = document.createElement("audio");
+                const title = document.createElement("p");
+                title.innerText = audio.title;
+                audioElement.controls = true;
+                audioElement.src = audio.url;
+
+                container.appendChild(title);
+                container.appendChild(audioElement);
+            });
+        }
+
+        fetchAudio();
+    </script>
+</body>
+</html>
