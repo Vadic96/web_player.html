@@ -73,7 +73,7 @@
         function renderTracks() {
             tracks.forEach((track, index) => {
                 const li = document.createElement('li');
-                li.textContent = track.title;
+                li.textContent = track.title || `Трек ${index + 1}`;
                 li.dataset.index = index;
                 li.style.cursor = 'pointer';
                 li.onclick = () => playTrack(index);
@@ -84,7 +84,8 @@
         function playTrack(index) {
             if (index >= 0 && index < tracks.length) {
                 currentTrackIndex = index;
-                audio.src = tracks[currentTrackIndex].url;
+                const track = tracks[currentTrackIndex];
+                audio.src = track.url.startsWith('http') ? track.url : `${window.location.origin}/${track.url}`;
                 audio.play();
                 updateButtons();
                 highlightTrack();
