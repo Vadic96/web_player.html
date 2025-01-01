@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Audio Player</title>
+    <style>
+        /* Загальний стиль */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Контейнер списку треків */
+        #track-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #track-list li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        #track-list li:last-child {
+            border-bottom: none;
+        }
+
+        #track-list li:hover {
+            background-color: #f1f1f1;
+        }
+
+        #track-list li.active {
+            background-color: #e1ecf4;
+            font-weight: bold;
+        }
+
+        /* Аудіоплеєр */
+        audio {
+            margin: 20px 0;
+            width: 90%;
+            max-width: 400px;
+            outline: none;
+        }
+
+        /* Кнопки керування */
+        div button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 30%;
+            max-width: 120px;
+        }
+
+        div button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:nth-child(1) {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+
+        button:nth-child(2) {
+            background-color: #f1c40f;
+            color: #fff;
+        }
+
+        button:nth-child(3) {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        /* Кнопка Fetch Tracks */
+        button.fetch-tracks {
+            margin-top: 20px;
+            background-color: #3498db;
+            color: #fff;
+            width: 90%;
+            max-width: 400px;
+            font-size: 18px;
+        }
+
+        button.fetch-tracks:hover {
+            background-color: #2980b9;
+        }
+
+        /* Адаптація для мобільних пристроїв */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            #track-list li {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+
+            audio {
+                margin: 15px 0;
+            }
+
+            div button {
+                font-size: 14px;
+                padding: 8px;
+                width: 28%;
+            }
+
+            button.fetch-tracks {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #track-list li {
+                font-size: 13px;
+            }
+
+            div button {
+                font-size: 13px;
+                padding: 6px;
+            }
+
+            button.fetch-tracks {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Telegram Audio Player</h1>
+
+    <!-- Кнопка для завантаження треків -->
+    <button class="fetch-tracks" onclick="fetchTracks()">Fetch Tracks</button>
+
+    <!-- Список треків -->
+    <ul id="track-list"></ul>
+
+    <!-- Аудіоплеєр -->
+    <audio id="audio-player" controls>
+        <source id="audio-source" src="" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Кнопки керування -->
+    <div>
+        <button onclick="playAudio()">Play</button>
+        <button onclick="pauseAudio()">Pause</button>
+        <button onclick="stopAudio()">Stop</button>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audio-player');
+        const audioSource = document.getElementById('audio-source');
+
+        // Завантаження треків з сервера
+        async function fetchTracks() {
+            const response = await fetch('http://localhost:8080/get_tracks'); // Змініть URL, якщо потрібно
+            const tracks = await response.json();
+
+            const trackList = document.getElementById('track-list');
+            trackList.innerHTML = '';
+
+            // Додаємо треки до списку
+            tracks.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${track.title} - ${track.performer}`;
+                li.onclick = () => selectTrack(li, track.url);
+                trackList.appendChild(li);
+            });
+        }
+
+        // Вибір треку
+        function selectTrack(selectedItem, url) {
+            // Знімаємо попередню активність
+            document.querySelectorAll('#track-list li').forEach(item => item.classList.remove('active'));
+            selectedItem.classList.add('active');
+
+            audioSource.src = url;
+            audioPlayer.load();
+            audioPlayer.play();
+        }
+
+        // Управління відтворенням
+        function playAudio() {
+            audioPlayer.play();
+        }
+
+        function pauseAudio() {
+            audioPlayer.pause();
+        }
+
+        function stopAudio() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0; // Переміщення на початок треку
+        }
+    </script>
+</body>
+</html>
